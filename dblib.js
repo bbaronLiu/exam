@@ -91,4 +91,4 @@ const findCustomer = (customer) => {
 };
 
 // Add towards the bottom of the page
-module.exports.findcustomer = findcustomer;
+module.exports.findCustomer = findCustomer;

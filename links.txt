@@ -1,2 +1,0 @@
-GitHub: https://github.com/bbaronLiu/cars
-Heroku: https://aqueous-reaches-23607.herokuapp.com/

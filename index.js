@@ -39,8 +39,8 @@ app.get("/", async (req, res) => {
       cusID: "",
       cusFname: "",
       cusLname: "",
-      cusState: ""
-      cusSalesYTD: ""
+      cusState: "",
+      cusSalesYTD: "",
       cusSalesPrev: ""
   };
   res.render("index", {
