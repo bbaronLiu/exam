@@ -6,33 +6,33 @@
 <form action="/" method="POST">
     <table>
         <tr>
-            <td><label for="cusId">ID</label>:</td>
-            <td><input type="number" name="cusId" id="cusId" value="<%= customer.cusId %>" /></td>
+            <td><label for="cusid">ID</label>:</td>
+            <td><input type="number" name="cusid" id="cusid" value="<%= customer.cusid %>" /></td>
             <td>(equal)</td>
         </tr>
         <tr>
-            <td><label for="cusFname">First Name</label>:</td>
-            <td><input type="text" name="cusFname" id="cusFname" value="<%= customer.cusFname %>" /></td>
+            <td><label for="cusfname">First Name</label>:</td>
+            <td><input type="text" name="cusfname" id="cusfname" value="<%= customer.cusfname %>" /></td>
             <td>(starts with)</td>
         </tr>
         <tr>
-            <td><label for="cusLname">Last Name</label>:</td>
-            <td><input type="text" name="cusLname" id="cusLname" value="<%= customer.cusLname %>" /></td>
+            <td><label for="cuslname">Last Name</label>:</td>
+            <td><input type="text" name="cuslname" id="cuslname" value="<%= customer.cuslname %>" /></td>
             <td>(starts with)</td>
         </tr>
         <tr>
-            <td><label for="cusState">State</label>:</td>
-            <td><input type="number" name="cusState" id="cusState" value="<%= customer.cusState %>" /></td>
+            <td><label for="cusstate">State</label>:</td>
+            <td><input type="text" name="cusstate" id="cusstate" value="<%= customer.cusstate %>" /></td>
             <td>(less than or equal to)</td>
         </tr>
         <tr>
-            <td><label for="cusSalesYTD">Sales YTD</label>:</td>
-            <td><input type="number" name="cusSalesYTD" id="cusSalesYTD" value="<%= customer.cusSalesYTD %>" /></td>
+            <td><label for="cussalesytd">Sales YTD</label>:</td>
+            <td><input type="number" name="cussalesytd" id="cussalesytd" value="<%= customer.cussalesytd %>" /></td>
             <td>(less than or equal to)</td>
         </tr>
         <tr>
-            <td><label for="cusSalesPrev">Previous Years Sales</label>:</td>
-            <td><input type="number" name="cusSalesPrev" id="cusSalesPrev" value="<%= customer.cusSalesPrev %>" /></td>
+            <td><label for="cussalesprev">Previous Years Sales</label>:</td>
+            <td><input type="number" name="cussalesprev" id="cussalesprev" value="<%= customer.cussalesprev %>" /></td>
             <td>(less than or equal to)</td>
         </tr>
         <tr>
@@ -63,12 +63,12 @@
             <tbody>
                 <% Array.from(result.result).forEach(customer => { %> 
                     <tr>
-                        <td><%= customer.cusId %></td>
-                        <td><%= customer.cusFname %></td>
-                        <td><%= customer.cusLname %></td>
-                        <td><%= customer.cusState %></td>
-                        <td><%= customer.cusSalesYTD %></td>
-                        <td><%= customer.cusSalesPrev %></td>
+                        <td><%= customer.cusid %></td>
+                        <td><%= customer.cusfname %></td>
+                        <td><%= customer.cuslname %></td>
+                        <td><%= customer.cusstate %></td>
+                        <td><%= customer.cussalesytd %></td>
+                        <td><%= customer.cussalesprev %></td>
                     </tr>
                 <% }); %>
             </tbody>

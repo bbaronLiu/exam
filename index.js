@@ -36,12 +36,12 @@ app.get("/", async (req, res) => {
   const totRecs = await dblib.getTotalRecords();
   //Create an empty customer object (To populate form with values)
   const customer = {
-      cusID: "",
-      cusFname: "",
-      cusLname: "",
-      cusState: "",
-      cusSalesYTD: "",
-      cusSalesPrev: ""
+      cusid: "",
+      cusfname: "",
+      cuslname: "",
+      cusstate: "",
+      cussalesytd: "",
+      cussalesprev: ""
   };
   res.render("index", {
       type: "get",
