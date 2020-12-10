@@ -30,8 +30,33 @@ app.listen(process.env.PORT || 3000, () => {
     console.log("Server started (http://localhost:3000/) !");
 });
 
+// Setup routes
+app.get("/", (req, res) => {
+    //res.send("Root resource - Up and running!")
+    res.render("index");
+});
 
-app.get("/", async (req, res) => {
+app.get("/create", (req, res) => {
+    //res.send("Root resource - Up and running!")
+    res.render("create");
+});
+
+app.get("/report", (req, res) => {
+    //res.send("Root resource - Up and running!")
+    res.render("report");
+});
+
+app.get("/export", (req, res) => {
+    //res.send("Root resource - Up and running!")
+    res.render("export");
+});
+
+app.get("/import", (req, res) => {
+    //res.send("Root resource - Up and running!")
+    res.render("import");
+});
+
+app.get("/manage", async (req, res) => {
   // Omitted validation check
   const totRecs = await dblib.getTotalRecords();
   //Create an empty customer object (To populate form with values)
@@ -43,7 +68,7 @@ app.get("/", async (req, res) => {
       cussalesytd: "",
       cussalesprev: ""
   };
-  res.render("index", {
+  res.render("manage", {
       type: "get",
       totRecs: totRecs.totRecords,
       customer: customer
@@ -58,7 +83,7 @@ app.get("/searchajax", async (req, res) => {
   });
 });
 
-app.post("/", async (req, res) => {
+app.post("/manage", async (req, res) => {
   // Omitted validation check
   //  Can get this from the page rather than using another DB call.
   //  Add it as a hidden form value.
@@ -66,7 +91,7 @@ app.post("/", async (req, res) => {
 
   dblib.findCustomer(req.body)
       .then(result => {
-          res.render("index", {
+          res.render("manage", {
               type: "post",
               totRecs: totRecs.totRecords,
               result: result,
@@ -74,7 +99,7 @@ app.post("/", async (req, res) => {
           })
       })
       .catch(err => {
-          res.render("index", {
+          res.render("manage", {
               type: "post",
               totRecs: totRecs.totRecords,
               result: `Unexpected Error: ${err.message}`,

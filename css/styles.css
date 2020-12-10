@@ -5,3 +5,7 @@
    table {
     background-color:  skyblue;
    }
+
+   div button {
+       float: right;
+   }
