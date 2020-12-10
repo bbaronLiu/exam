@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 const getTotalRecords = () => {
-    sql = "SELECT COUNT(*) FROM car";
+    sql = "SELECT COUNT(*) FROM customer";
     return pool.query(sql)
         .then(result => {
             return {
@@ -29,38 +29,48 @@ module.exports.getTotalRecords = getTotalRecords;
 
 
 
-const findCar = (car) => {
+const findCustomer = (customer) => {
     // Will build query based on data provided from the form
     //  Use parameters to avoid sql injection
 
     // Declare variables
     var i = 1;
     params = [];
-    sql = "SELECT * FROM car WHERE true";
+    sql = "SELECT * FROM customer WHERE true";
 
     // Check data provided and build query as necessary
-    if (car.carvin !== "") {
-        params.push(parseInt(car.carvin));
-        sql += ` AND carvin = $${i}`;
+    if (customer.cusID !== "") {
+        params.push(parseInt(customer.cusID));
+        sql += ` AND cusID = $${i}`;
         i++;
     };
-    if (car.carmake !== "") {
-        params.push(`${car.carmake}%`);
-        sql += ` AND UPPER(carmake) LIKE UPPER($${i})`;
+    if (customer.cusFname !== "") {
+        params.push(`${customer.cusFname}%`);
+        sql += ` AND UPPER(cusFname) LIKE UPPER($${i})`;
         i++;
     };
-    if (car.carmodel !== "") {
-        params.push(`${car.carmodel}%`);
-        sql += ` AND UPPER(carmodel) LIKE UPPER($${i})`;
+    if (customer.cusLname !== "") {
+        params.push(`${customer.cusLname}%`);
+        sql += ` AND UPPER(cusLname) LIKE UPPER($${i})`;
         i++;
     };
-    if (car.carmileage !== "") {
-        params.push(parseFloat(car.carmileage));
-        sql += ` AND carmileage <= $${i}`;
+    if (customer.cusState !== "") {
+        params.push(parseFloat(customer.cusState));
+        sql += ` AND cusState <= $${i}`;
+        i++;
+    };
+    if (customer.cusSalesYTD !== "") {
+        params.push(parseFloat(customer.cusSalesYTD));
+        sql += ` AND cusSalesYTD <= $${i}`;
+        i++;
+    };
+    if (customer.cusSalesPrev !== "") {
+        params.push(parseFloat(customer.cusSalesPrev));
+        sql += ` AND cusSalesPrev <= $${i}`;
         i++;
     };
 
-    sql += ` ORDER BY carvin`;
+    sql += ` ORDER BY cusID`;
     // for debugging
      console.log("sql: " + sql);
      console.log("params: " + params);
@@ -81,4 +91,4 @@ const findCar = (car) => {
 };
 
 // Add towards the bottom of the page
-module.exports.findCar = findCar;
+module.exports.findcustomer = findcustomer;

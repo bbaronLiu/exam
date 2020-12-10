@@ -34,17 +34,19 @@ app.listen(process.env.PORT || 3000, () => {
 app.get("/", async (req, res) => {
   // Omitted validation check
   const totRecs = await dblib.getTotalRecords();
-  //Create an empty car object (To populate form with values)
-  const car = {
-      carvin: "",
-      carmake: "",
-      carmodel: "",
-      carmileage: ""
+  //Create an empty customer object (To populate form with values)
+  const customer = {
+      cusID: "",
+      cusFname: "",
+      cusLname: "",
+      cusState: ""
+      cusSalesYTD: ""
+      cusSalesPrev: ""
   };
   res.render("index", {
       type: "get",
       totRecs: totRecs.totRecords,
-      car: car
+      customer: customer
   });
 });
 
@@ -62,13 +64,13 @@ app.post("/", async (req, res) => {
   //  Add it as a hidden form value.
   const totRecs = await dblib.getTotalRecords();
 
-  dblib.findCar(req.body)
+  dblib.findCustomer(req.body)
       .then(result => {
           res.render("index", {
               type: "post",
               totRecs: totRecs.totRecords,
               result: result,
-              car: req.body
+              customer: req.body
           })
       })
       .catch(err => {
@@ -76,13 +78,13 @@ app.post("/", async (req, res) => {
               type: "post",
               totRecs: totRecs.totRecords,
               result: `Unexpected Error: ${err.message}`,
-              car: req.body
+              customer: req.body
           });
       });
 });
 
 app.post("/searchajax", upload.array(), async (req, res) => {
-  dblib.findCar(req.body)
+  dblib.findCustomer(req.body)
       .then(result => res.send(result))
       .catch(err => res.send({trans: "Error", result: err.message}));
 
