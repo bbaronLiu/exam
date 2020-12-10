@@ -1,3 +1,5 @@
+const { default: parseMoney } = require("parse-money");
+const parsemoney = require("parse-money");
 // Add packages
 require("dotenv").config();
 // Add database package and connection string
@@ -60,12 +62,12 @@ const findCustomer = (customer) => {
         i++;
     };
     if (customer.cussalesytd !== "") {
-        params.push(`${customer.cussalesytd}`);
+        params.push(parseFloat(customer.cussalesytd));
         sql += ` AND cussalesytd >= $${i}`;
         i++;
     };
     if (customer.cussalesprev !== "") {
-        params.push(`${customer.cussalesprev}`);
+        params.push(parseFloat(customer.cussalesprev));
         sql += ` AND cussalesprev >= $${i}`;
         i++;
     };
