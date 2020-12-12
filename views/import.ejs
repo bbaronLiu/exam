@@ -1,6 +1,15 @@
 <%- include("_header") -%>
 
-<h1> Customer List Application </h1>
-<h1> Select a Task from the Top Navigation Bar </h1>
+<h1> Customer Import </h1>
+
+<label for ="databasefile">Total number of records in the database: <%= totRecs %> </label>
+<br>
+<label for="databasefile">Select a file with customers for Database Insert</label>
+<br>
+
+<input type="file"
+       id="databasefile" name="databasefile"
+       accept="text/plain">
+
 
 <%- include("_footer") -%>   

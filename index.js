@@ -2,15 +2,29 @@
 const express = require("express");
 const app = express();
 const dblib = require("./dblib.js");
+const path = require('path')
+const { Pool } = require('pg');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
 const multer = require("multer");
 const upload = multer();
 
 // Add middleware to parse default urlencoded form
 app.use(express.urlencoded({ extended: false }));
+// Adding bootstrap
+app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
+app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist')))
+
 
 // Setup EJS
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Enable CORS (see https://enable-cors.org/server_expressjs.html)
 app.use((req, res, next) => {
@@ -32,14 +46,49 @@ app.listen(process.env.PORT || 3000, () => {
 
 // Setup routes
 app.get("/", (req, res) => {
+    //testing pool.query 
     //res.send("Root resource - Up and running!")
+    // pool.query('SELECT * from customer', (err, result) => {
+    //     if (err) {
+    //       return console.error('Error executing query', err.stack)
+    //     }
+    //     console.log(result) // brianc
+    //   })
+    
     res.render("index");
 });
 
+// GET /create
 app.get("/create", (req, res) => {
-    //res.send("Root resource - Up and running!")
-    res.render("create");
-});
+    res.render("create", { model: {} });
+  });
+
+// GET /edit/5
+app.get("/edit/:id", (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM customer WHERE cusid = $1";
+    pool.query(sql, [id], (err, result) => {
+        if (err) {
+            return console.error(err.message);
+          }
+      res.render("edit", { model: result.rows[0] });
+    });
+  });
+
+app.get("/create", async (req, res) => {
+    // Omitted validation check
+    const totRecs = await dblib.getTotalRecords();
+    //Create an empty customer object (To populate form with values)
+    const customer = {
+        cusid: "",
+        cusfname: "",
+        cuslname: "",
+        cusstate: "",
+        cussalesytd: "",
+        cussalesprev: ""
+    };
+    res.render("create", { model: {}});
+  });
 
 app.get("/report", (req, res) => {
     //res.send("Root resource - Up and running!")
@@ -49,11 +98,6 @@ app.get("/report", (req, res) => {
 app.get("/export", (req, res) => {
     //res.send("Root resource - Up and running!")
     res.render("export");
-});
-
-app.get("/import", (req, res) => {
-    //res.send("Root resource - Up and running!")
-    res.render("import");
 });
 
 app.get("/manage", async (req, res) => {
@@ -83,6 +127,65 @@ app.get("/searchajax", async (req, res) => {
   });
 });
 
+// GET /delete/5
+app.get("/delete/:id", (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM customer WHERE cusid = $1";
+    pool.query(sql, [id], (err, result) => {
+      // if (err) ...
+      res.render("delete", { model: result.rows[0]});
+    });
+  });
+
+app.get("/import", async (req, res) => {
+    // Omitted validation check
+    const totRecs = await dblib.getTotalRecords();
+    //Create an empty customer object (To populate form with values)
+    const customer = {
+        cusid: "",
+        cusfname: "",
+        cuslname: "",
+        cusstate: "",
+        cussalesytd: "",
+        cussalesprev: ""
+    };
+    res.render("import", {
+        type: "get",
+        totRecs: totRecs.totRecords,
+        customer: customer
+    });
+  });
+  
+  app.get("/searchajax", async (req, res) => {
+    // Omitted validation check
+    const totRecs = await dblib.getTotalRecords();
+    res.render("searchajax", {
+        totRecs: totRecs.totRecords,
+    });
+  });
+
+  // POST /create
+app.post("/create", (req, res) => {
+    const sql = "INSERT INTO customer (cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5)";
+    const book = [req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
+    pool.query(sql, customer, (err, result) => {
+        if (err) {
+            return console.error(err.message);
+          }
+      res.redirect("/manage");
+    });
+  });
+
+// POST /delete/5
+app.post("/delete/:id", (req, res) => {
+    const id = req.params.id;
+    const sql = "DELETE FROM customer WHERE cusid = $1";
+    pool.query(sql, [id], (err, result) => {
+      // if (err) ...
+      res.redirect("/manage");
+    });
+  });  
+
 app.post("/manage", async (req, res) => {
   // Omitted validation check
   //  Can get this from the page rather than using another DB call.
@@ -107,6 +210,20 @@ app.post("/manage", async (req, res) => {
           });
       });
 });
+
+// POST /edit/5
+app.post("/edit/:id", (req, res) => {
+    const id = req.params.id;
+    const customer = [req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev, id];
+    const sql = "UPDATE customer SET cusfname = $1 cuslname = $2, cusstate = $3, cussalesytd = $4, cussalesprev = $5 WHERE (cusid = $6)";
+    pool.query(sql, customer, (err, result) => {
+        if (err) {
+            return console.error(err.message);
+          }
+      res.redirect("/manage");
+    });
+  });
+
 
 app.post("/searchajax", upload.array(), async (req, res) => {
   dblib.findCustomer(req.body)

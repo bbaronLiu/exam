@@ -59,7 +59,7 @@
                     <th>State</th>
                     <th>Sales YTD</th>
                     <th>Previous Years Sales</th>
-                    <th><button type="button">Create Customer</button></th>
+                    <th><a class="btn" href="/create">Create Customer</a></th>
                 </tr>
             </thead>
             
@@ -72,8 +72,10 @@
                         <td><%= customer.cusstate %></td>
                         <td><%= customer.cussalesytd %></td>
                         <td><%= customer.cussalesprev %></td>
-                        <td><a href="https://www.w3schools.com/">Edit</a></td>
-                        <td><a href="https://www.w3schools.com/">Delete</a></td>
+                        <td class="d-print-none">
+                            <a class="btn btn-sm btn-warning" href="/edit/<%= customer.cusid %>">Edit</a>
+                            <a class="btn btn-sm btn-danger" href="/delete/<%= customer.cusid %>">Delete</a>
+                          </td>
                     </tr>
                 <% }); %>
             </tbody>
