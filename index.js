@@ -119,7 +119,9 @@ app.get("/delete/:id", (req, res) => {
     const sql = "SELECT * FROM customer WHERE cusid = $1";
     pool.query(sql, [id], (err, result) => {
       // if (err) ...
-      res.render("delete", { model: result.rows[0]});
+      res.render("delete", { model: result.rows[0],
+        type: "get"
+      });
     });
   });
 
@@ -181,7 +183,7 @@ app.post("/delete/:id", async (req, res) => {
     try {
       const result = await pool.query(sql, [id], (err, result) => {
         // if (err) ...
-        res.render("delete", {
+        res.render("delete", { model: result,
           type: "POST",
           result: result.rowCount
         });
