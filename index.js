@@ -60,7 +60,8 @@ app.get("/", (req, res) => {
 
 // GET /create
 app.get("/create", (req, res) => {
-    res.render("create", { model: {} });
+    res.render("create", { model: {},
+    type: "get" });
   });
 
 // GET /edit/5
@@ -73,21 +74,6 @@ app.get("/edit/:id", (req, res) => {
           }
       res.render("edit", { model: result.rows[0] });
     });
-  });
-
-app.get("/create", async (req, res) => {
-    // Omitted validation check
-    const totRecs = await dblib.getTotalRecords();
-    //Create an empty customer object (To populate form with values)
-    const customer = {
-        cusid: "",
-        cusfname: "",
-        cuslname: "",
-        cusstate: "",
-        cussalesytd: "",
-        cussalesprev: ""
-    };
-    res.render("create", { model: {}});
   });
 
 app.get("/report", (req, res) => {
@@ -165,26 +151,52 @@ app.get("/import", async (req, res) => {
   });
 
   // POST /create
-app.post("/create", (req, res) => {
-    const sql = "INSERT INTO customer (cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5)";
-    const book = [req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
-    pool.query(sql, customer, (err, result) => {
-        if (err) {
-            return console.error(err.message);
-          }
-      res.redirect("/manage");
-    });
-  });
+app.post("/create", async (req, res) => {
+    const sql = "INSERT INTO customer (cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+    const customer = [req.body.cusid, req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
+    const customers = req.body;
+
+    try {
+      const result = await pool.query(sql, customer);
+      res.render("create", {
+        type: "POST",
+        model: customers,
+        // rowCount is a part of the export interface QueryResultBase which I can use as an identifier
+        // for my /create page to create a success message
+        result: result.rowCount,
+      });
+    } catch (err) {
+      res.render("create", {
+        type: "POST",
+        model: customers,
+        result: err.message,
+      })
+    }
+});
 
 // POST /delete/5
-app.post("/delete/:id", (req, res) => {
+app.post("/delete/:id", async (req, res) => {
     const id = req.params.id;
     const sql = "DELETE FROM customer WHERE cusid = $1";
-    pool.query(sql, [id], (err, result) => {
-      // if (err) ...
-      res.redirect("/manage");
-    });
-  });  
+    try {
+      const result = await pool.query(sql, [id], (err, result) => {
+        // if (err) ...
+        res.render("delete", {
+          type: "POST",
+          result: result.rowCount
+        });
+      });
+    } 
+    
+    catch (err) {
+      res.render("delete", {
+        type: "POST",
+        model: customers,
+        result: err.message,
+      })
+    }
+
+});  
 
 app.post("/manage", async (req, res) => {
   // Omitted validation check
@@ -214,10 +226,11 @@ app.post("/manage", async (req, res) => {
 // POST /edit/5
 app.post("/edit/:id", (req, res) => {
     const id = req.params.id;
-    const customer = [req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev, id];
-    const sql = "UPDATE customer SET cusfname = $1 cuslname = $2, cusstate = $3, cussalesytd = $4, cussalesprev = $5 WHERE (cusid = $6)";
+    const customer = [req.body.cusid, req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
+    const sql = "UPDATE customer SET cusfname = $2, cuslname = $3, cusstate = $4, cussalesytd = $5, cussalesprev = $6 WHERE (cusid = $1)";
     pool.query(sql, customer, (err, result) => {
         if (err) {
+          console.log(customer)
             return console.error(err.message);
           }
       res.redirect("/manage");

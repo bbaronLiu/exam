@@ -1,6 +1,6 @@
 <%- include("_header") -%>
 
-<h1>Delete a record?</h1>
+<h1>Are you sure you want to delete <%= model.cusfname %>'s record?</h1>
 
 <form action="/delete/<%= model.cusid %>" method="post">
   <div class="form-horizontal">
@@ -16,5 +16,17 @@
     </div>
   </div>
 </form>
+
+<% if(type === "POST") { %>
+  <% if (result === 1) { %>
+    <h1>Customer Deleted Successfully!</h1>
+    <% } else { %>
+      <h1>Error Deleting Customer </h1>
+      <h4><%= result %></h4>
+    <% } %>
+<% } %>
+
+<%- include("_footer") -%>
+
 
 <%- include("_footer") -%>
