@@ -76,14 +76,41 @@ app.get("/edit/:id", (req, res) => {
     });
   });
 
-app.get("/report", (req, res) => {
-    //res.send("Root resource - Up and running!")
-    res.render("report");
-});
+  app.get("/report", async (req, res) => {
+    // Omitted validation check
+    const totRecs = await dblib.getTotalRecords();
+    res.render("report", {
+        type: "get",
+        totRecs: totRecs.totRecords,
+        dropdownVals: "",
+        a: "",
+        b: "",
+        c: ""
+    });
+  });
 
-app.get("/export", (req, res) => {
-    //res.send("Root resource - Up and running!")
-    res.render("export");
+  app.get("/export", (req, res) => {
+    var message = "";
+    res.render("export",{ message: message });
+  });
+
+  app.post("/export", (req, res) => {
+    const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer ORDER BY cusid";
+    pool.query(sql, [], (err, result) => {
+        var message = "";
+        if(err) {
+            message = `Error - ${err.message}`;
+            res.render("export", { message: message })
+        } else {
+            var output = "";
+            result.rows.forEach(customer => {
+                output += `${customer.cusid},${customer.cusfname},${customer.cuslname},${customer.cusstate},${customer.cussalesytd},${customer.cussalesprev}\r\n`;
+            });
+            res.header("Content-Type", "text/txt");
+            res.attachment("export.txt");
+            return res.send(output);
+        };
+    });
 });
 
 app.get("/manage", async (req, res) => {
@@ -225,6 +252,61 @@ app.post("/manage", async (req, res) => {
       });
 });
 
+
+
+app.post("/report", async (req, res) => {
+  // Omitted validation check
+  //  Can get this from the page rather than using another DB call.
+  //  Add it as a hidden form value.
+  const totRecs = await dblib.getTotalRecords();
+  const drop = req.body.report;
+  console.log(drop);
+  if (drop === "alllname") {
+
+      console.log("does this work")
+      const result = await dblib.findReportA();
+      res.render("report", {
+        type: "post",
+        totRecs: totRecs.totRecords,
+        result: result,
+        customer: req.body,
+        a: "selected",
+        b: "",
+        c: ""
+      });
+  }
+
+  if (drop === "allsalesd") {
+
+      console.log("does this work")
+      const result = await dblib.findReportB();
+      res.render("report", {
+        type: "post",
+        totRecs: totRecs.totRecords,
+        result: result,
+        customer: req.body,
+        dropdownVals: req.body.report,
+        a: "",
+        b: "selected",
+        c: ""
+      });
+    };
+  
+  if (drop === "threerandom") {
+    console.log("does this work")
+    const result = await dblib.findReportC();
+    res.render("report", {
+      type: "post",
+      totRecs: totRecs.totRecords,
+      result: result,
+      customer: req.body,
+      a: "",
+      b: "",
+      c: "selected"
+    });
+  }
+});
+
 // POST /edit/5
 app.post("/edit/:id", (req, res) => {
     const id = req.params.id;
@@ -238,11 +320,3 @@ app.post("/edit/:id", (req, res) => {
       res.redirect("/manage");
     });
   });
-
-
-app.post("/searchajax", upload.array(), async (req, res) => {
-  dblib.findCustomer(req.body)
-      .then(result => res.send(result))
-      .catch(err => res.send({trans: "Error", result: err.message}));
-
-});

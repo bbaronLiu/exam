@@ -29,6 +29,60 @@ const getTotalRecords = () => {
 
 module.exports.getTotalRecords = getTotalRecords;
 
+const findReportA = () => {
+    console.log()
+    sql = "SELECT * FROM customer ORDER BY cuslname"
+    return pool.query(sql)
+    .then(result => {
+        return { 
+            trans: "success",
+            result: result.rows
+        }
+    })
+    .catch(err => {
+        return {
+            trans: "Error",
+            result: `Error: ${err.message}`
+        }
+    });
+}
+
+const findReportB = () => {
+    console.log()
+    sql = "SELECT * FROM customer ORDER BY cussalesytd DESC"
+    return pool.query(sql)
+    .then(result => {
+        return { 
+            trans: "success",
+            result: result.rows
+        }
+    })
+    .catch(err => {
+        return {
+            trans: "Error",
+            result: `Error: ${err.message}`
+        }
+    });
+}
+
+
+const findReportC = () => {
+    console.log()
+    sql = "SELECT * FROM customer ORDER BY RANDOM() LIMIT 3"
+    return pool.query(sql)
+    .then(result => {
+        return { 
+            trans: "success",
+            result: result.rows
+        }
+    })
+    .catch(err => {
+        return {
+            trans: "Error",
+            result: `Error: ${err.message}`
+        }
+    });
+}
 
 
 const findCustomer = (customer) => {
@@ -186,3 +240,6 @@ const createCustomer = (customer) => {
 // Add towards the bottom of the page
 module.exports.findCustomer = findCustomer;
 module.exports.createCustomer = createCustomer;
+module.exports.findReportA = findReportA;
+module.exports.findReportB = findReportB;
+module.exports.findReportC = findReportC;
