@@ -6,10 +6,11 @@
 <br>
 <label for="databasefile">Select a file with customers for Database Insert</label>
 <br>
-
+<form action="/import" method="POST">
 <input type="file"
        id="databasefile" name="databasefile"
        accept="text/plain">
-
+<input type="submit" value="Submit" />
+</form>
 
 <%- include("_footer") -%>   

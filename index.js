@@ -252,6 +252,42 @@ app.post("/manage", async (req, res) => {
       });
 });
 
+app.post("/import", upload.single("filename"), async (req, res) => {
+  console.log(req.body);
+  res.render("import", {
+    type: "post",
+    totRecs: totRecs.totRecords,
+    customer: customer
+  // Declare variables
+
+  // Loop to insert - using async () function and await
+// Not using try catch block
+// (async () => {
+//   console.log("--- STEP 1: Pre-Loop");
+//   for (prod of products) {
+//       console.log("--- STEP 2: In-Loop Before Insert");
+//       const result = await dblib.createCustomer(prod);
+//       console.log("--- STEP 3: In-Loop After Insert");
+//       console.log("result is: ", result);
+//       if (result.trans === "success") {
+//           numInserted++;
+//       } else {
+//           numFailed++;
+//           errorMessage += `${result.msg} \r\n`;
+//       };
+//   };    
+//   console.log("--- STEP 4: After-Loop");
+//   console.log(`Records processed: ${numInserted + numFailed}`);
+//   console.log(`Records successfully inserted: ${numInserted}`);
+//   console.log(`Records with insertion errors: ${numFailed}`);
+//   if(numFailed > 0) {
+//       console.log("Error Details:");
+//       console.log(errorMessage);
+//   };
+// })()
+
+})
+
 
 
 app.post("/report", async (req, res) => {
