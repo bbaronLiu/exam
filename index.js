@@ -353,7 +353,8 @@ app.post("/report", async (req, res) => {
         customer: req.body,
         a: "selected",
         b: "",
-        c: ""
+        c: "",
+        lucky: ""
       });
   }
 
@@ -369,7 +370,8 @@ app.post("/report", async (req, res) => {
         dropdownVals: req.body.report,
         a: "",
         b: "selected",
-        c: ""
+        c: "",
+        lucky: ""
       });
     };
   
@@ -383,7 +385,8 @@ app.post("/report", async (req, res) => {
       customer: req.body,
       a: "",
       b: "",
-      c: "selected"
+      c: "selected",
+      lucky: "lucky"
     });
   }
 });

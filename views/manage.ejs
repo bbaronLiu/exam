@@ -50,7 +50,8 @@
         <h3>No records found!</h3>
     <% } else { %>
         <h4>Number of Records Found: <%=result.result.length %></h4>
-        <table>
+    <div class="table-responsive-sm">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -59,7 +60,7 @@
                     <th>State</th>
                     <th>Sales YTD</th>
                     <th>Previous Years Sales</th>
-                    <th><a class="btn" href="/create">Create Customer</a></th>
+                    <th><a class="btn btn-sm btn-success" href="/create">Create Customer</a></th>
                 </tr>
             </thead>
             
@@ -81,6 +82,7 @@
             </tbody>
 
         </table>
+    </div>
     <% } %>
 <% } %>
 

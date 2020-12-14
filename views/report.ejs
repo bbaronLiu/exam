@@ -24,8 +24,11 @@
             $('.selDiv option')
             .filter(function(i, e) { return $(e).text() == dropdownVals})
             </script>
-        <h4>Number of Records Found: <%=result.result.length %></h4>
-        <table>
+    <% if (lucky === "lucky") { %>
+            <h3>The three Lucky Winners are</h3>
+        <% } %>
+        <div class="table-responsive-sm">
+            <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -46,15 +49,12 @@
                         <td><%= customer.cusstate %></td>
                         <td><%= customer.cussalesytd %></td>
                         <td><%= customer.cussalesprev %></td>
-                        <td class="d-print-none">
-                            <a class="btn btn-sm btn-warning" href="/edit/<%= customer.cusid %>">Edit</a>
-                            <a class="btn btn-sm btn-danger" href="/delete/<%= customer.cusid %>">Delete</a>
-                          </td>
                     </tr>
                 <% }); %>
             </tbody>
 
         </table>
+        </div>
     <% } %>
 <% } %>
 
