@@ -4,6 +4,9 @@ const app = express();
 const dblib = require("./dblib.js");
 const path = require('path')
 const { Pool } = require('pg');
+
+var fileupload = require("express-fileupload");
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -20,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
 app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist')))
-
+app.use(fileupload());
 
 // Setup EJS
 app.set("view engine", "ejs");
@@ -252,41 +255,78 @@ app.post("/manage", async (req, res) => {
       });
 });
 
-app.post("/import", upload.single("filename"), async (req, res) => {
-  console.log(req.body);
-  res.render("import", {
-    type: "post",
-    totRecs: totRecs.totRecords,
-    customer: customer
-  // Declare variables
+app.post("/import",  async (req, res) => {
 
-  // Loop to insert - using async () function and await
-// Not using try catch block
-// (async () => {
-//   console.log("--- STEP 1: Pre-Loop");
-//   for (prod of products) {
-//       console.log("--- STEP 2: In-Loop Before Insert");
-//       const result = await dblib.createCustomer(prod);
-//       console.log("--- STEP 3: In-Loop After Insert");
-//       console.log("result is: ", result);
-//       if (result.trans === "success") {
-//           numInserted++;
-//       } else {
-//           numFailed++;
-//           errorMessage += `${result.msg} \r\n`;
-//       };
-//   };    
-//   console.log("--- STEP 4: After-Loop");
-//   console.log(`Records processed: ${numInserted + numFailed}`);
-//   console.log(`Records successfully inserted: ${numInserted}`);
-//   console.log(`Records with insertion errors: ${numFailed}`);
-//   if(numFailed > 0) {
-//       console.log("Error Details:");
-//       console.log(errorMessage);
-//   };
-// })()
+  (async () => {
+    const x = req.files.databasefile.data;
+    const y = x.toString()
+    const customers = y.split(/\r?\n/);
+    var i = 0;
+    var numFailed = 0;
+    var numInserted = 0;
+    var errorMessage = "";
+    const sql = "INSERT INTO customer (cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
 
-})
+    console.log("--- STEP 1: Pre-Loop");
+    for (customer in customers ) {
+      var m = customers[i]
+      var k = m.split(",")
+      console.log(k);
+      var i = i + 1;
+      console.log("--- STEP 2: In-Loop Before Insert");
+      const result = await dblib.createImport(k);
+      console.log("--- STEP 3: In-Loop After Insert");
+      console.log("result is: ", result);
+      if (result.trans === "success") {
+        numInserted++;
+      } else {
+        numFailed++;
+        errorMessage += `${result.result} \r\n`;
+      };
+      console.log("--- STEP 4: After-Loop");
+      console.log(`Records processed: ${numInserted + numFailed}`);
+      console.log(`Records successfully inserted: ${numInserted}`);
+      console.log(`Records with insertion errors: ${numFailed}`);
+      if(numFailed > 0) {
+          console.log("Error Details:");
+          console.log(errorMessage);
+        }
+      };
+      const totRecs = await dblib.getTotalRecords();
+      res.render("import", {
+        type: "post",
+        processed: numInserted + numFailed,
+        inserted: numInserted,
+        notInserted: numFailed,
+        errorMessage: errorMessage,
+        totRecs: totRecs.totRecords
+    })
+    })()
+
+  // (async () => {
+  //   console.log("--- STEP 1: Pre-Loop");
+  //   for (customer in customers ) {
+  //     console.log("--- STEP 2: In-Loop Before Insert");
+  //     const result = await dblib.createCustomer(customer);
+  //     console.log("--- STEP 3: In-Loop After Insert");
+  //     console.log("result is: ", result);
+  //     if (result.trans === "success") {
+  //       numInserted++;
+  //     } else {
+  //       numFailed++;
+  //       errorMessage += `${result.msg} \r\n`;
+  //     };
+  //     console.log("--- STEP 4: After-Loop");
+  //     console.log(`Records processed: ${numInserted + numFailed}`);
+  //     console.log(`Records successfully inserted: ${numInserted}`);
+  //     console.log(`Records with insertion errors: ${numFailed}`);
+  //     if(numFailed > 0) {
+  //         console.log("Error Details:");
+  //         console.log(errorMessage);
+  //       }
+  //     };
+  //   })()
+});
 
 
 

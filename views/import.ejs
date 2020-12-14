@@ -6,11 +6,30 @@
 <br>
 <label for="databasefile">Select a file with customers for Database Insert</label>
 <br>
-<form action="/import" method="POST">
-<input type="file"
-       id="databasefile" name="databasefile"
-       accept="text/plain">
+<form action="/import" method="post" enctype="multipart/form-data" onsubmit="return makeWait()">
+<input type="file" id="databasefile" name="databasefile" accept="text/plain">
 <input type="submit" value="Submit" />
 </form>
+<div id="id"></div>
+<script>
+       function makeWait() {
+              var d1 = document.getElementById('id');
+              d1.insertAdjacentHTML('afterend', '<h1 id="id1">Wait for Results</h1>');
+       }
+</script>
+
+<% if (type === "post") { %>
+<h1>Import Summary</h1>
+<h4>Records Processed: <%= processed %></h4>
+<h4>Records Inserted successfully: <%= inserted %></h4>
+<h4>Records Not Inserted: <%= notInserted %></h4>
+
+<% if (notInserted > 0) { %>
+       <h4>Errors: </h4>
+       <pre><p><%= errorMessage %></p></pre>
+<% } %>
+
+
+<% } %>
 
 <%- include("_footer") -%>   

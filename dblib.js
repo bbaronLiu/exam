@@ -237,9 +237,39 @@ const createCustomer = (customer) => {
         });
 };
 
+
+const createImport = (k) => {
+    // Will build query based on data provided from the form
+    //  Use parameters to avoid sql injection
+
+    // Declare variables
+    var i = 1;
+    const sql = "INSERT INTO customer (cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+
+    // for debugging
+     console.log("sql: " + sql);
+
+    return pool.query(sql, k)
+        .then(result => {
+            return { 
+                trans: "success",
+                result: result.rows
+            }
+        })
+        .catch(err => {
+            return {
+                trans: "Error",
+                result: `Error: ${err.message}`
+            }
+        });
+};
+
+
+
 // Add towards the bottom of the page
 module.exports.findCustomer = findCustomer;
 module.exports.createCustomer = createCustomer;
 module.exports.findReportA = findReportA;
 module.exports.findReportB = findReportB;
 module.exports.findReportC = findReportC;
+module.exports.createImport = createImport;
