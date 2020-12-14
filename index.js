@@ -98,7 +98,7 @@ app.get("/edit/:id", (req, res) => {
   });
 
   app.post("/export", (req, res) => {
-    const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer ORDER BY cusid";
+    const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer ORDER BY cusid"; 1000.00 
     pool.query(sql, [], (err, result) => {
         var message = "";
         if(err) {
@@ -109,6 +109,10 @@ app.get("/edit/:id", (req, res) => {
             result.rows.forEach(customer => {
                 output += `${customer.cusid},${customer.cusfname},${customer.cuslname},${customer.cusstate},${customer.cussalesytd},${customer.cussalesprev}\r\n`;
             });
+            String.prototype.trim = function() {
+              return this.replace(/^\s+|\s+$/g, "");
+            };
+            output = output.trim();
             res.header("Content-Type", "text/txt");
             res.attachment("export.txt");
             return res.send(output);
@@ -261,6 +265,7 @@ app.post("/import",  async (req, res) => {
     const x = req.files.databasefile.data;
     const y = x.toString()
     const customers = y.split(/\r?\n/);
+    console.log(customers);
     var i = 0;
     var numFailed = 0;
     var numInserted = 0;
