@@ -2,7 +2,7 @@
 
 <h1> Import Books </h1>
 
-<label for ="databasefile">Total number of books in the database: <%= totRecs %> </label>
+<label for ="databasefile">Total number of books in the database: <b><%= totRecs %></b> </label>
 <br>
 <label for="databasefile">Select a file with books  for Database Insert</label>
 <br>
@@ -20,9 +20,12 @@
 
 <% if (type === "post") { %>
 <h1>Import Summary</h1>
-<h4>Records Processed: <%= processed %></h4>
-<h4>Records Inserted successfully: <%= inserted %></h4>
-<h4>Records Not Inserted: <%= notInserted %></h4>
+<p>Initial number of books in the database:  <%= totRecs %></p>
+<p>Books inserted successfully: <%= inserted %></p>
+<p>Resulting number of books in the database:</p>
+<h2>Error Summary</h2>
+<p>Total book records processed: <%= processed %></p>
+<p>Total book records not inserted: <b><%= notInserted %></b></p>
 
 <% if (notInserted > 0) { %>
        <h4>Errors: </h4>

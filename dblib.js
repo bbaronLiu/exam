@@ -291,12 +291,14 @@ const createImport = (k) => {
     return pool.query(sql, k)
         .then(result => {
             return { 
+                id: "",
                 trans: "success",
                 result: result.rows
             }
         })
         .catch(err => {
             return {
+                id: "Book ID: " +  k[0] + " - ",
                 trans: "Error",
                 result: `Error: ${err.message}`
             }

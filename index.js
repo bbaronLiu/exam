@@ -102,103 +102,8 @@ app.post("/sum",  (req, res) => {
   });
 });
 
-// GET /create
-app.get("/create", (req, res) => {
-    res.render("create", { model: {},
-    type: "get" });
-  });
 
-// GET /edit/5
-app.get("/edit/:id", (req, res) => {
-    const id = req.params.id;
-    const sql = "SELECT * FROM book WHERE book_id = $1";
-    pool.query(sql, [id], (err, result) => {
-        if (err) {
-            return console.error(err.message);
-          }
-      res.render("edit", { model: result.rows[0] });
-    });
-  });
 
-  app.get("/report", async (req, res) => {
-    // Omitted validation check
-    const totRecs = await dblib.getTotalRecords();
-    res.render("report", {
-        type: "get",
-        totRecs: totRecs.totRecords,
-        dropdownVals: "",
-        a: "",
-        b: "",
-        c: ""
-    });
-  });
-
-  app.get("/export", (req, res) => {
-    var message = "";
-    res.render("export",{ message: message });
-  });
-
-  app.post("/export", (req, res) => {
-    const sql = "SELECT book_id, title, total_pages, rating, isbn, published_date FROM book ORDER BY book_id"; 1000.00 
-    pool.query(sql, [], (err, result) => {
-        var message = "";
-        if(err) {
-            message = `Error - ${err.message}`;
-            res.render("export", { message: message })
-        } else {
-            var output = "";
-            result.rows.forEach(book => {
-                output += `${book.book_id},${book.title},${book.total_pages},${book.rating},${book.isbn},${book.published_date}\r\n`;
-            });
-            String.prototype.trim = function() {
-              return this.replace(/^\s+|\s+$/g, "");
-            };
-            output = output.trim();
-            res.header("Content-Type", "text/txt");
-            res.attachment("export.txt");
-            return res.send(output);
-        };
-    });
-});
-
-app.get("/manage", async (req, res) => {
-  // Omitted validation check
-  const totRecs = await dblib.getTotalRecords();
-  //Create an empty book object (To populate form with values)
-  const book = {
-      book_id: "",
-      title: "",
-      total_pages: "",
-      rating: "",
-      isbn: "",
-      published_date: ""
-  };
-  res.render("manage", {
-      type: "get",
-      totRecs: totRecs.totRecords,
-      book: book
-  });
-});
-
-app.get("/searchajax", async (req, res) => {
-  // Omitted validation check
-  const totRecs = await dblib.getTotalRecords();
-  res.render("searchajax", {
-      totRecs: totRecs.totRecords,
-  });
-});
-
-// GET /delete/5
-app.get("/delete/:id", (req, res) => {
-    const id = req.params.id;
-    const sql = "SELECT * FROM book WHERE book_id = $1";
-    pool.query(sql, [id], (err, result) => {
-      // if (err) ...
-      res.render("delete", { model: result.rows[0],
-        type: "get"
-      });
-    });
-  });
 
 app.get("/import", async (req, res) => {
     // Omitted validation check
@@ -219,90 +124,11 @@ app.get("/import", async (req, res) => {
     });
   });
   
-  app.get("/searchajax", async (req, res) => {
-    // Omitted validation check
-    const totRecs = await dblib.getTotalRecords();
-    res.render("searchajax", {
-        totRecs: totRecs.totRecords,
-    });
-  });
-
-  // POST /create
-app.post("/create", async (req, res) => {
-    const sql = "INSERT INTO book (book_id, title, total_pages, rating, isbn, published_date) VALUES ($1, $2, $3, $4, $5, $6)";
-    const book = [req.body.book_id, req.body.title, req.body.total_pages, req.body.rating, req.body.isbn, req.body.published_date];
-    const books = req.body;
-
-    try {
-      const result = await pool.query(sql, book);
-      res.render("create", {
-        type: "POST",
-        model: books,
-        // rowCount is a part of the export interface QueryResultBase which I can use as an identifier
-        // for my /create page to create a success message
-        result: result.rowCount,
-      });
-    } catch (err) {
-      res.render("create", {
-        type: "POST",
-        model: books,
-        result: err.message,
-      })
-    }
-});
-
-// POST /delete/5
-app.post("/delete/:id", async (req, res) => {
-    const id = req.params.id;
-    const sql = "DELETE FROM book WHERE book_id = $1";
-    try {
-      const result = await pool.query(sql, [id], (err, result) => {
-        // if (err) ...
-        res.render("delete", { model: result,
-          type: "POST",
-          result: result.rowCount
-        });
-      });
-    } 
-    
-    catch (err) {
-      res.render("delete", {
-        type: "POST",
-        model: books,
-        result: err.message,
-      })
-    }
-
-});  
-
-app.post("/manage", async (req, res) => {
-  // Omitted validation check
-  //  Can get this from the page rather than using another DB call.
-  //  Add it as a hidden form value.
-  const totRecs = await dblib.getTotalRecords();
-
-  dblib.findbook(req.body)
-      .then(result => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: result,
-              book: req.body
-          })
-      })
-      .catch(err => {
-          res.render("manage", {
-              type: "post",
-              totRecs: totRecs.totRecords,
-              result: `Unexpected Error: ${err.message}`,
-              book: req.body
-          });
-      });
-});
 
 app.post("/import",  async (req, res) => {
 
   (async () => {
+    let id = "";
     const x = req.files.databasefile.data;
     const y = x.toString()
     const books = y.split(/\r?\n/);
@@ -328,7 +154,8 @@ app.post("/import",  async (req, res) => {
         numInserted++;
       } else {
         numFailed++;
-        errorMessage += `${result.result} \r\n`;
+
+        errorMessage += result.id + `${result.result} \r\n`;
       };
       console.log("--- STEP 4: After-Loop");
       console.log(`Records processed: ${numInserted + numFailed}`);
@@ -342,6 +169,7 @@ app.post("/import",  async (req, res) => {
       const totRecs = await dblib.getTotalRecords();
       res.render("import", {
         type: "post",
+        new: numInserted + totRecs.totRecords,
         processed: numInserted + numFailed,
         inserted: numInserted,
         notInserted: numFailed,
@@ -377,72 +205,3 @@ app.post("/import",  async (req, res) => {
 
 
 
-app.post("/report", async (req, res) => {
-  // Omitted validation check
-  //  Can get this from the page rather than using another DB call.
-  //  Add it as a hidden form value.
-  const totRecs = await dblib.getTotalRecords();
-  const drop = req.body.report;
-  console.log(drop);
-  if (drop === "alllname") {
-
-      console.log("does this work")
-      const result = await dblib.findReportA();
-      res.render("report", {
-        type: "post",
-        totRecs: totRecs.totRecords,
-        result: result,
-        book: req.body,
-        a: "selected",
-        b: "",
-        c: "",
-        lucky: ""
-      });
-  }
-
-  if (drop === "allsalesd") {
-
-      console.log("does this work")
-      const result = await dblib.findReportB();
-      res.render("report", {
-        type: "post",
-        totRecs: totRecs.totRecords,
-        result: result,
-        book: req.body,
-        dropdownVals: req.body.report,
-        a: "",
-        b: "selected",
-        c: "",
-        lucky: ""
-      });
-    };
-  
-  if (drop === "threerandom") {
-    console.log("does this work")
-    const result = await dblib.findReportC();
-    res.render("report", {
-      type: "post",
-      totRecs: totRecs.totRecords,
-      result: result,
-      book: req.body,
-      a: "",
-      b: "",
-      c: "selected",
-      lucky: "lucky"
-    });
-  }
-});
-
-// POST /edit/5
-app.post("/edit/:id", (req, res) => {
-    const id = req.params.id;
-    const book = [req.body.book_id, req.body.title, req.body.total_pages, req.body.rating, req.body.isbn, req.body.published_date];
-    const sql = "UPDATE book SET title = $2, total_pages = $3, rating = $4, isbn = $5, published_date = $6 WHERE (book_id = $1)";
-    pool.query(sql, book, (err, result) => {
-        if (err) {
-          console.log(book)
-            return console.error(err.message);
-          }
-      res.redirect("/manage");
-    });
-  });
