@@ -1,10 +1,10 @@
 <%- include("_header") -%>
 
-<h1> Customer Import </h1>
+<h1> Import Books </h1>
 
-<label for ="databasefile">Total number of records in the database: <%= totRecs %> </label>
+<label for ="databasefile">Total number of books in the database: <%= totRecs %> </label>
 <br>
-<label for="databasefile">Select a file with customers for Database Insert</label>
+<label for="databasefile">Select a file with books  for Database Insert</label>
 <br>
 <form action="/import" method="post" enctype="multipart/form-data" onsubmit="return makeWait()">
 <input type="file" id="databasefile" name="databasefile" accept="text/plain" required>

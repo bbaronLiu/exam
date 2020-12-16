@@ -1,39 +1,39 @@
 <%- include("_header") -%>
 
-<h2> Find Customers </h2>
+<h2> Find Book </h2>
 <h3> Total number of database records:<%= totRecs %> </h3>
 <!-- Not using bootstrap, just a simple form that you may enhance -->
 <form action="/manage" method="POST">
     <table>
         <tr>
-            <td><label for="cusid">ID</label>:</td>
-            <td><input type="number" name="cusid" id="cusid" value="<%= customer.cusid %>" /></td>
+            <td><label for="book_id">ID</label>:</td>
+            <td><input type="number" name="book_id" id="book_id" value="<%= book.book_id %>" /></td>
             <td>(equals)</td>
         </tr>
         <tr>
-            <td><label for="cusfname">First Name</label>:</td>
-            <td><input type="text" name="cusfname" id="cusfname" value="<%= customer.cusfname %>" /></td>
+            <td><label for="title">Title</label>:</td>
+            <td><input type="text" name="title" id="title" value="<%= book.title %>" /></td>
             <td>(begins with)</td>
         </tr>
         <tr>
-            <td><label for="cuslname">Last Name</label>:</td>
-            <td><input type="text" name="cuslname" id="cuslname" value="<%= customer.cuslname %>" /></td>
-            <td>(begins with)</td>
+            <td><label for="total_pages">Total Pages</label>:</td>
+            <td><input type="number" name="total_pages" id="total_pages" value="<%= book.total_pages %>" /></td>
+            <td>(greater than or equal to)</td>
         </tr>
         <tr>
-            <td><label for="cusstate">State</label>:</td>
-            <td><input type="text" name="cusstate" id="cusstate" value="<%= customer.cusstate %>" /></td>
+            <td><label for="rating">Rating</label>:</td>
+            <td><input type="number" name="rating" id="rating" value="<%= book.rating %>" /></td>
+            <td>(greater than or equal to)</td>
+        </tr>
+        <tr>
+            <td><label for="isbn">ISBN</label>:</td>
+            <td><input type="number" name="isbn" id="isbn" value="<%= book.isbn %>" /></td>
             <td>(equals)</td>
         </tr>
         <tr>
-            <td><label for="cussalesytd">Sales YTD</label>:</td>
-            <td><input type="number" name="cussalesytd" id="cussalesytd" value="<%= customer.cussalesytd %>" /></td>
-            <td>(greater than or equal to)</td>
-        </tr>
-        <tr>
-            <td><label for="cussalesprev">Previous Years Sales</label>:</td>
-            <td><input type="number" name="cussalesprev" id="cussalesprev" value="<%= customer.cussalesprev %>" /></td>
-            <td>(greater than or equal to)</td>
+            <td><label for="published_date">Date Published</label>:</td>
+            <td><input type="date" name="published_date" id="published_date" value="<%= book.published_date %>" /></td>
+            <td>(equals)</td>
         </tr>
         <tr>
             <td span="2">
@@ -55,27 +55,27 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>State</th>
-                    <th>Sales YTD</th>
-                    <th>Previous Years Sales</th>
-                    <th><a class="btn btn-sm btn-success" href="/create">Create Customer</a></th>
+                    <th>Title</th>
+                    <th>Total Pages</th>
+                    <th>Rating</th>
+                    <th>ISBN</th>
+                    <th>Date Published</th>
+                    <th><a class="btn btn-sm btn-success" href="/create">Create book</a></th>
                 </tr>
             </thead>
             
             <tbody>
-                <% Array.from(result.result).forEach(customer => { %> 
+                <% Array.from(result.result).forEach(book => { %> 
                     <tr>
-                        <td><%= customer.cusid %></td>
-                        <td><%= customer.cusfname %></td>
-                        <td><%= customer.cuslname %></td>
-                        <td><%= customer.cusstate %></td>
-                        <td><%= customer.cussalesytd %></td>
-                        <td><%= customer.cussalesprev %></td>
+                        <td><%= book.book_id %></td>
+                        <td><%= book.title %></td>
+                        <td><%= book.total_pages %></td>
+                        <td><%= book.rating %></td>
+                        <td><%= book.isbn %></td>
+                        <td><%= book.published_date %></td>
                         <td class="d-print-none">
-                            <a class="btn btn-sm btn-warning" href="/edit/<%= customer.cusid %>">Edit</a>
-                            <a class="btn btn-sm btn-danger" href="/delete/<%= customer.cusid %>">Delete</a>
+                            <a class="btn btn-sm btn-warning" href="/edit/<%= book.book_id %>">Edit</a>
+                            <a class="btn btn-sm btn-danger" href="/delete/<%= book.book_id %>">Delete</a>
                           </td>
                     </tr>
                 <% }); %>

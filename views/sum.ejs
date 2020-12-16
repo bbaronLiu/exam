@@ -1,0 +1,40 @@
+<%- include("_header") -%>
+
+<h1>Calculate Sum of Series</h1>
+
+<form action="/sum" method="POST">
+    <table>
+        <tr>
+            <td><label for="starting">Enter Starting Number</label>:</td>
+            <td><input type="number" name="starting" id="starting" value="<%= number.starting %>" required/></td>
+            <td>(required)</td>
+        </tr>
+        <tr>
+            <td><label for="ending">Enter Ending Number</label>:</td>
+            <td><input type="number" name="ending" id="ending" value="<%= number.ending %>" required/></td>
+            <td>required)</td>
+        </tr>
+        <tr>
+            <td><label for="increment">Enter Increment</label>:</td>
+            <td><input type="number" name="increment" id="increment" value="<%= number.increment %>" required/></td>
+            <td>(required)</td>
+        </tr>
+        <tr>
+            <td>
+            <input class="btn btn-sm btn-success" type="submit" value="Calculate Sum" >
+            </td>
+        </tr>
+    </table>
+</form>
+
+<% if (type === "post") { %>
+    <% if (checker === "no") { %>
+        <h3 style="color:red;">Ending number must be less than starting number</h3>
+    <% } else { %>
+        <p>The sum of the numbers from <%=number.starting %> to <%=number.ending %> incremented by <%=number.increment %> is <b><%=sum%></b></p>
+    <% } %>
+<% } %>
+
+
+
+<%- include("_footer") -%>   

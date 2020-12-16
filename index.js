@@ -51,7 +51,7 @@ app.listen(process.env.PORT || 3000, () => {
 app.get("/", (req, res) => {
     //testing pool.query 
     //res.send("Root resource - Up and running!")
-    // pool.query('SELECT * from customer', (err, result) => {
+    // pool.query('SELECT * from book', (err, result) => {
     //     if (err) {
     //       return console.error('Error executing query', err.stack)
     //     }
@@ -59,6 +59,47 @@ app.get("/", (req, res) => {
     //   })
     
     res.render("index");
+});
+
+app.get("/sum", (req, res) => {
+  const number = {
+    starting: null,
+    ending: null,
+    increment: null
+  }
+  res.render("sum", {
+  number: number,
+  type: "get" 
+  });
+});
+
+// /post sum
+app.post("/sum",  (req, res) => {
+  let checker = "";
+  let sum = ""
+  const number = {
+    starting: req.body.starting,
+    ending: req.body.ending,
+    increment: req.body.increment
+  }
+  var starting = req.body.starting
+  var ending = req.body.ending
+  var increment = req.body.increment
+  if (ending > starting) {
+    const result = dblib.getSum(starting, ending, increment);
+    sum = result.sum
+  } else {
+    checker = "no"
+  }
+
+  res.render("sum", {
+    type: "post",
+    sum: sum,
+     number: number,
+     result: sum,
+     checker: checker
+     
+  });
 });
 
 // GET /create
@@ -70,7 +111,7 @@ app.get("/create", (req, res) => {
 // GET /edit/5
 app.get("/edit/:id", (req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM customer WHERE cusid = $1";
+    const sql = "SELECT * FROM book WHERE book_id = $1";
     pool.query(sql, [id], (err, result) => {
         if (err) {
             return console.error(err.message);
@@ -98,7 +139,7 @@ app.get("/edit/:id", (req, res) => {
   });
 
   app.post("/export", (req, res) => {
-    const sql = "SELECT cusid, cusfname, cuslname, cusstate, cussalesytd::numeric, cussalesprev::numeric FROM customer ORDER BY cusid"; 1000.00 
+    const sql = "SELECT book_id, title, total_pages, rating, isbn, published_date FROM book ORDER BY book_id"; 1000.00 
     pool.query(sql, [], (err, result) => {
         var message = "";
         if(err) {
@@ -106,8 +147,8 @@ app.get("/edit/:id", (req, res) => {
             res.render("export", { message: message })
         } else {
             var output = "";
-            result.rows.forEach(customer => {
-                output += `${customer.cusid},${customer.cusfname},${customer.cuslname},${customer.cusstate},${customer.cussalesytd},${customer.cussalesprev}\r\n`;
+            result.rows.forEach(book => {
+                output += `${book.book_id},${book.title},${book.total_pages},${book.rating},${book.isbn},${book.published_date}\r\n`;
             });
             String.prototype.trim = function() {
               return this.replace(/^\s+|\s+$/g, "");
@@ -123,19 +164,19 @@ app.get("/edit/:id", (req, res) => {
 app.get("/manage", async (req, res) => {
   // Omitted validation check
   const totRecs = await dblib.getTotalRecords();
-  //Create an empty customer object (To populate form with values)
-  const customer = {
-      cusid: "",
-      cusfname: "",
-      cuslname: "",
-      cusstate: "",
-      cussalesytd: "",
-      cussalesprev: ""
+  //Create an empty book object (To populate form with values)
+  const book = {
+      book_id: "",
+      title: "",
+      total_pages: "",
+      rating: "",
+      isbn: "",
+      published_date: ""
   };
   res.render("manage", {
       type: "get",
       totRecs: totRecs.totRecords,
-      customer: customer
+      book: book
   });
 });
 
@@ -150,7 +191,7 @@ app.get("/searchajax", async (req, res) => {
 // GET /delete/5
 app.get("/delete/:id", (req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM customer WHERE cusid = $1";
+    const sql = "SELECT * FROM book WHERE book_id = $1";
     pool.query(sql, [id], (err, result) => {
       // if (err) ...
       res.render("delete", { model: result.rows[0],
@@ -162,19 +203,19 @@ app.get("/delete/:id", (req, res) => {
 app.get("/import", async (req, res) => {
     // Omitted validation check
     const totRecs = await dblib.getTotalRecords();
-    //Create an empty customer object (To populate form with values)
-    const customer = {
-        cusid: "",
-        cusfname: "",
-        cuslname: "",
-        cusstate: "",
-        cussalesytd: "",
-        cussalesprev: ""
+    //Create an empty book object (To populate form with values)
+    const book = {
+        book_id: "",
+        title: "",
+        total_pages: "",
+        rating: "",
+        isbn: "",
+        published_date: ""
     };
     res.render("import", {
         type: "get",
         totRecs: totRecs.totRecords,
-        customer: customer
+        book: book
     });
   });
   
@@ -188,15 +229,15 @@ app.get("/import", async (req, res) => {
 
   // POST /create
 app.post("/create", async (req, res) => {
-    const sql = "INSERT INTO customer (cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
-    const customer = [req.body.cusid, req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
-    const customers = req.body;
+    const sql = "INSERT INTO book (book_id, title, total_pages, rating, isbn, published_date) VALUES ($1, $2, $3, $4, $5, $6)";
+    const book = [req.body.book_id, req.body.title, req.body.total_pages, req.body.rating, req.body.isbn, req.body.published_date];
+    const books = req.body;
 
     try {
-      const result = await pool.query(sql, customer);
+      const result = await pool.query(sql, book);
       res.render("create", {
         type: "POST",
-        model: customers,
+        model: books,
         // rowCount is a part of the export interface QueryResultBase which I can use as an identifier
         // for my /create page to create a success message
         result: result.rowCount,
@@ -204,7 +245,7 @@ app.post("/create", async (req, res) => {
     } catch (err) {
       res.render("create", {
         type: "POST",
-        model: customers,
+        model: books,
         result: err.message,
       })
     }
@@ -213,7 +254,7 @@ app.post("/create", async (req, res) => {
 // POST /delete/5
 app.post("/delete/:id", async (req, res) => {
     const id = req.params.id;
-    const sql = "DELETE FROM customer WHERE cusid = $1";
+    const sql = "DELETE FROM book WHERE book_id = $1";
     try {
       const result = await pool.query(sql, [id], (err, result) => {
         // if (err) ...
@@ -227,7 +268,7 @@ app.post("/delete/:id", async (req, res) => {
     catch (err) {
       res.render("delete", {
         type: "POST",
-        model: customers,
+        model: books,
         result: err.message,
       })
     }
@@ -240,13 +281,13 @@ app.post("/manage", async (req, res) => {
   //  Add it as a hidden form value.
   const totRecs = await dblib.getTotalRecords();
 
-  dblib.findCustomer(req.body)
+  dblib.findbook(req.body)
       .then(result => {
           res.render("manage", {
               type: "post",
               totRecs: totRecs.totRecords,
               result: result,
-              customer: req.body
+              book: req.body
           })
       })
       .catch(err => {
@@ -254,7 +295,7 @@ app.post("/manage", async (req, res) => {
               type: "post",
               totRecs: totRecs.totRecords,
               result: `Unexpected Error: ${err.message}`,
-              customer: req.body
+              book: req.body
           });
       });
 });
@@ -264,20 +305,21 @@ app.post("/import",  async (req, res) => {
   (async () => {
     const x = req.files.databasefile.data;
     const y = x.toString()
-    const customers = y.split(/\r?\n/);
-    console.log(customers);
+    const books = y.split(/\r?\n/);
     var i = 0;
     var numFailed = 0;
     var numInserted = 0;
     var errorMessage = "";
-    const sql = "INSERT INTO customer (cusid, cusfname, cuslname, cusstate, cussalesytd, cussalesprev) VALUES ($1, $2, $3, $4, $5, $6)";
+    const sql = "INSERT INTO book (book_id, title, total_pages, rating, isbn, published_date) VALUES ($1, $2, $3, $4, $5, $6)";
 
     console.log("--- STEP 1: Pre-Loop");
-    for (customer in customers ) {
-      var m = customers[i]
+    for (book in books ) {
+      var m = books[i]
       var k = m.split(",")
-      console.log(k);
       var i = i + 1;
+      if (k[5] === "Null") {
+        k[5] = null;
+      }
       console.log("--- STEP 2: In-Loop Before Insert");
       const result = await dblib.createImport(k);
       console.log("--- STEP 3: In-Loop After Insert");
@@ -310,9 +352,9 @@ app.post("/import",  async (req, res) => {
 
   // (async () => {
   //   console.log("--- STEP 1: Pre-Loop");
-  //   for (customer in customers ) {
+  //   for (book in books ) {
   //     console.log("--- STEP 2: In-Loop Before Insert");
-  //     const result = await dblib.createCustomer(customer);
+  //     const result = await dblib.createbook(book);
   //     console.log("--- STEP 3: In-Loop After Insert");
   //     console.log("result is: ", result);
   //     if (result.trans === "success") {
@@ -350,7 +392,7 @@ app.post("/report", async (req, res) => {
         type: "post",
         totRecs: totRecs.totRecords,
         result: result,
-        customer: req.body,
+        book: req.body,
         a: "selected",
         b: "",
         c: "",
@@ -366,7 +408,7 @@ app.post("/report", async (req, res) => {
         type: "post",
         totRecs: totRecs.totRecords,
         result: result,
-        customer: req.body,
+        book: req.body,
         dropdownVals: req.body.report,
         a: "",
         b: "selected",
@@ -382,7 +424,7 @@ app.post("/report", async (req, res) => {
       type: "post",
       totRecs: totRecs.totRecords,
       result: result,
-      customer: req.body,
+      book: req.body,
       a: "",
       b: "",
       c: "selected",
@@ -394,11 +436,11 @@ app.post("/report", async (req, res) => {
 // POST /edit/5
 app.post("/edit/:id", (req, res) => {
     const id = req.params.id;
-    const customer = [req.body.cusid, req.body.cusfname, req.body.cuslname, req.body.cusstate, req.body.cussalesytd, req.body.cussalesprev];
-    const sql = "UPDATE customer SET cusfname = $2, cuslname = $3, cusstate = $4, cussalesytd = $5, cussalesprev = $6 WHERE (cusid = $1)";
-    pool.query(sql, customer, (err, result) => {
+    const book = [req.body.book_id, req.body.title, req.body.total_pages, req.body.rating, req.body.isbn, req.body.published_date];
+    const sql = "UPDATE book SET title = $2, total_pages = $3, rating = $4, isbn = $5, published_date = $6 WHERE (book_id = $1)";
+    pool.query(sql, book, (err, result) => {
         if (err) {
-          console.log(customer)
+          console.log(book)
             return console.error(err.message);
           }
       res.redirect("/manage");
